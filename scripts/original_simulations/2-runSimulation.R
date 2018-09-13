@@ -18,7 +18,7 @@ top3cause.df <- rbind(top3cause.df, c("Other", 99))
 child.clean <- ConvertData.phmrc(child.raw, phmrc.type = "child")$output
 
 ### Read in the CSMFs that we will be using for test & train
-csmf.split <- readRDS(file.path("..", "data", "csmf.rds"))
+csmf.split <- readRDS(file.path("..", "..", "data", "csmf.rds"))
 
 ### Create setting data frame with number of runs (1-100) and each split type on it
 setting.df <- expand.grid(run = 1:100, split = 1:5, calib.size = c(100, 200, 400, 600))
@@ -86,7 +86,7 @@ calib.final <- test.final[calib.index,]
 test.final <- test.final[-calib.index,]
 ################################
 ### Make data directory for this run
-sim.dir <- file.path("..", "data", "simulation_runs",
+sim.dir <- file.path("..", "..", "data", "simulation_runs",
                      paste0("split_", setting$split, "_size_", setting$calib.size),
                      paste0("run_", setting$run))
 dir.create(sim.dir, recursive = TRUE)

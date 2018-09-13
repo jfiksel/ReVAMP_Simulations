@@ -1,6 +1,6 @@
 library(ggplot2)
 library(dplyr)
-results <- readRDS("../data/simulation_results.rds")
+results <- readRDS("../../data/simulation_results.rds")
 results$csmf.acc.split <- round(results$csmf.acc.split, 2)
 
 ### relevel results
@@ -26,7 +26,7 @@ ccc.plot <-
     facet_grid(calib.size ~ csmf.acc.split) +
     geom_boxplot() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))
-viz.dir <- "../visualizations"
+viz.dir <- "../../visualizations"
 if(!dir.exists(viz.dir)){
     dir.create(viz.dir)
 }

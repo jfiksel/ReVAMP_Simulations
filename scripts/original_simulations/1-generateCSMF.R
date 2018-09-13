@@ -18,7 +18,7 @@ csmf.accuracy <- sapply(1:ndraws, function(i) {
     ### Check if all CSMFS are between .05 and 5
     if(all(c(ptrain, ptest) > .05) & all(c(ptrain, ptest) < .50)) {
         ### Treat ptest at CSMF_true and ptrain as CSMF_pred
-        return(1 - sum(abs(ptest - ptrain)) / 2 * (1 - min(ptest)))
+        return(1 - sum(abs(ptest - ptrain)) / (2 * (1 - min(ptest))))
     } else {
         return(NA)
     }
@@ -33,7 +33,7 @@ o <- order(csmf.accuracy, decreasing = FALSE)
 index.want <- o[seq(1, nrow(ptrain.mat), length.out = 5)]
 ptrain.out <- ptrain.mat[index.want,]
 ptest.out <- ptest.mat[index.want,]
-data.dir <-file.path("..", "data") 
+data.dir <-file.path("..", "..", "data") 
 if(!(dir.exists(data.dir))) {
     dir.create(data.dir)
 }

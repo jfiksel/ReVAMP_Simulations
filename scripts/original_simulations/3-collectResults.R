@@ -2,7 +2,7 @@ library(dplyr)
 setting.df <- expand.grid(run = 1:100, split = 1:5, calib.size = c(100, 200, 400, 600))
 results.list <- lapply(1:nrow(setting.df), function(i){
     setting <- setting.df[i,]
-    sim.dir <- file.path("..", "data", "simulation_runs",
+    sim.dir <- file.path("..", "..", "data", "simulation_runs",
                          paste0("split_", setting$split, "_size_", setting$calib.size),
                          paste0("run_", setting$run))
     results.file <- file.path(sim.dir, "results.rds")
@@ -20,4 +20,4 @@ results.list <- lapply(1:nrow(setting.df), function(i){
     return(combined.results)
 })
 results.df <- do.call(rbind, results.list)
-saveRDS(results.df, "../data/simulation_results.rds")
+saveRDS(results.df, "../../data/simulation_results.rds")
