@@ -6,4 +6,4 @@
 #$ -j y
 #$ -R y
 #$ -t 1-8000
-Rscript 2-runSimulation.R $SGE_TASK_ID
+Rscript 1-runSimulation.R $SGE_TASK_ID

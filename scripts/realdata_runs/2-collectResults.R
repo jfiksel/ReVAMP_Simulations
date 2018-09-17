@@ -18,9 +18,6 @@ results.list <- lapply(1:nrow(setting.df), function(i){
         ### Get CSMFA between calib & test and train & test
         topcause <- results$topcause.df
         csmf.acc <- results$csmf.acc
-        if(!("ensemble_revamp") %in% csmf.acc$method){
-            print(i)
-        }
         csmf.acc <- cbind(csmf.acc, setting)
         csmf.acc$csmfa.calib <- getCSMF_accuracy(topcause$ptest_orig, topcause$ptest)
         csmf.acc$csmfa.train <- getCSMF_accuracy(topcause$ptrain, topcause$ptest)

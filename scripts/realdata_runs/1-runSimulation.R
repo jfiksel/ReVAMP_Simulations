@@ -34,7 +34,7 @@ ncod <- setting$ncod
 set.seed(all.seeds[i])
 ### split data into country we are using and other
 country.data <- child.clean[countries == setting$country,]
-train.init <- child.clean[countries != setting$country,]
+train.final <- child.clean[countries != setting$country,]
 ### Reduce these to the top 7 COD + other (but not including Other defined causes in top 7) for the country data
 ### VA34 code for other defined COD is 14
 top.cod <- names(sort(table(country.data$Cause[country.data$Cause != 14]), decreasing = TRUE)[1:(ncod - 1)])
@@ -52,61 +52,23 @@ changeTopCOD <- function(topcod, topcause.df = top.cause.df) {
     return(topcod)
 }
 
-top.cause.df$ptrain <- sapply(top.cause.df$va34, function(c) mean(changeTopCOD(train.init$Cause) == c))
-top.cause.df$ptest_orig <- sapply(top.cause.df$va34, function(c) mean(changeTopCOD(country.data$Cause) == c))
+top.cause.df$ptrain <- sapply(top.cause.df$va34, function(c) mean(changeTopCOD(train.final$Cause) == c))
+top.cause.df$ptest <- sapply(top.cause.df$va34, function(c) mean(changeTopCOD(country.data$Cause) == c))
 
 ### Read in the CSMFs that we will be using for ptest
 ### this should correspond to NCOD
-data.dir <-file.path("..", "..", "data") 
-csmf.test <- readRDS(file.path(data.dir, paste0("csmf_country_sims_", ncod, ".rds")))
-ptest <- csmf.test[i,]
-
-### Add these probabilities into our top.cause.df object
-top.cause.df$ptest <- ptest
 
 ### Randomly split country data into training and calibration
-test_smp_size <- floor(.66 * nrow(country.data))
-test_ind <- sample(seq_len(nrow(country.data)), size = test_smp_size)
-test.init <- country.data[test_ind,]
-calib.init <- country.data[-test_ind,]
+calib_ind <- sample(seq_len(nrow(country.data)), size = setting$calib.size, replace = F)
+test.final <- country.data[-calib_ind,]
+calib.final <- country.data[calib_ind,]
 
-### Split each of these data frames by cause
-train.split <- split(train.init, changeTopCOD(train.init$Cause))
-calib.split <- split(calib.init, changeTopCOD(calib.init$Cause))
-test.split <- split(test.init, changeTopCOD(test.init$Cause))
 
-#### Function to resample data set
-resample.data <- function(data.split, nresamp, causes, csmf) {
-    ### csmf should be in same order as causes
-    C <- length(causes)
-    ncause <- floor(nresamp * csmf)
-    ncause[C] <- nresamp - sum(ncause[1:(C-1)])
-    
-    data.list <- lapply(seq_along(causes), function(i) {
-        cause <- causes[i]
-        if(length(which(names(data.split) == cause)) == 0) {
-            return(NULL)
-        } else {
-            data.cause <- data.split[[which(names(data.split) == cause)]]
-            return(data.cause[sample(nrow(data.cause), ncause[i], replace = TRUE),]) 
-        }
-        
-    })
-    return(do.call(rbind, data.list))
-}
 ### Get causes (these will be the ordering we will use)
 causes <- top.cause.df$va34
-### set sample sizes
-ntrain <- 800
-ntest <- 800
-ncalib <- setting$calib.size
-train.final <- resample.data(train.split, ntrain, causes, top.cause.df$ptrain)
-calib.final <- resample.data(calib.split, ncalib, causes, top.cause.df$ptest_orig)
-test.final <- resample.data(test.split, ntest, causes, top.cause.df$ptest)
-
 ################################
 ### Make data directory for this run
-sim.dir <- file.path("..", "..", "data", "country_runs",
+sim.dir <- file.path("..", "..", "data", "real_data_runs",
                      paste0(setting$country, "_size_", setting$calib.size, "_ncod_", ncod),
                      paste0("run_", setting$run))
 dir.create(sim.dir, recursive = TRUE)
